@@ -5,11 +5,15 @@ import { mockUser, mockMarketData } from '../data/mockData';
 interface DashboardPageProps {
   walletConnected: boolean;
   onConnectWallet: () => void;
+  onDisconnectWallet: () => void;
+  walletAddress?: string | null;
 }
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({ 
-  walletConnected, 
-  onConnectWallet 
+export const DashboardPage: React.FC<DashboardPageProps> = ({
+  walletConnected,
+  onConnectWallet,
+  onDisconnectWallet,
+  walletAddress,
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50/30 to-blue-50/30 relative overflow-hidden">
@@ -19,7 +23,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(135deg,transparent_0%,rgba(59,130,246,0.02)_50%,transparent_100%)]"></div>
       <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8 relative z-10">
@@ -64,14 +68,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Wallet Status</p>
-                <p className={`text-sm font-semibold ${walletConnected ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {walletConnected ? 'Connected' : 'Disconnected'}
+            <div>
+              <p className="text-sm font-medium text-gray-600">Wallet Status</p>
+              {walletConnected && walletAddress ? (
+                <p className="text-sm font-semibold text-emerald-600">
+                  Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </p>
-              </div>
-              <Wallet className={`w-8 h-8 ${walletConnected ? 'text-emerald-500' : 'text-gray-400'}`} />
+              ) : (
+                <p className="text-sm font-semibold text-red-600">Disconnected</p>
+              )}
             </div>
           </div>
         </div>
@@ -90,7 +95,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     <p className="text-sm text-gray-600">Modern Downtown Loft • 2 hours ago</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-lg">
                   <Search className="w-5 h-5 text-emerald-500" />
                   <div className="flex-1">
@@ -98,7 +103,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     <p className="text-sm text-gray-600">Downtown Apartments • 1 day ago</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg">
                   <Shield className="w-5 h-5 text-purple-500" />
                   <div className="flex-1">
@@ -114,15 +119,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <h3 className="text-xl font-semibold mb-6">Saved Searches</h3>
               <div className="space-y-4">
                 {mockUser.savedSearches.map((search) => (
-                  <div key={search.id} className="border border-gray-200/50 bg-white/50 rounded-lg p-4 hover:border-blue-300 hover:bg-white/80 transition-all duration-300 cursor-pointer backdrop-blur-sm">
+                  <div
+                    key={search.id}
+                    className="border border-gray-200/50 bg-white/50 rounded-lg p-4 hover:border-blue-300 hover:bg-white/80 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="font-medium text-gray-900 mb-1">{search.name}</h4>
                         <div className="text-sm text-gray-600">
-                          {search.filters.type && <span className="capitalize">{search.filters.type} • </span>}
-                          {search.filters.location && <span>{search.filters.location} • </span>}
-                          {search.filters.minPrice && <span>${search.filters.minPrice.toLocaleString()}</span>}
-                          {search.filters.maxPrice && <span> - ${search.filters.maxPrice.toLocaleString()}</span>}
+                          {search.filters.type && (
+                            <span className="capitalize">{search.filters.type} • </span>
+                          )}
+                          {search.filters.location && (
+                            <span>{search.filters.location} • </span>
+                          )}
+                          {search.filters.minPrice && (
+                            <span>${search.filters.minPrice.toLocaleString()}</span>
+                          )}
+                          {search.filters.maxPrice && (
+                            <span> - ${search.filters.maxPrice.toLocaleString()}</span>
+                          )}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">Created {search.createdAt}</div>
                       </div>
@@ -141,16 +157,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             {/* Wallet Section */}
             <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6">
               <h3 className="text-xl font-semibold mb-6">Wallet Connection</h3>
-              {walletConnected ? (
+              {walletConnected && walletAddress ? (
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                     <span className="text-emerald-600 font-medium">Wallet Connected</span>
                   </div>
                   <div className="text-sm text-gray-600 break-all bg-gray-50 p-3 rounded-lg">
-                    0x742d35cc6634C0532925a3b8D6aD8a7e15b2a9d1
+                    {walletAddress}
                   </div>
-                  <button className="w-full border border-red-300 text-red-600 hover:bg-red-50 py-2 px-4 rounded-lg transition-colors">
+                  <button
+                    onClick={onDisconnectWallet}
+                    className="w-full border border-red-300 text-red-600 hover:bg-red-50 py-2 px-4 rounded-lg transition-colors"
+                  >
                     Disconnect Wallet
                   </button>
                 </div>
@@ -158,7 +177,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <div className="space-y-4">
                   <div className="text-center py-6">
                     <Wallet className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600 mb-4">Connect your wallet to access NFT properties and blockchain features.</p>
+                    <p className="text-gray-600 mb-4">
+                      Connect your wallet to access NFT properties and blockchain features.
+                    </p>
                     <button
                       onClick={onConnectWallet}
                       className="w-full bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-700 hover:to-emerald-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
@@ -202,7 +223,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     Property values increased {mockMarketData.monthlyGrowth} this quarter
                   </p>
                 </div>
-                
+
                 <div className="p-4 bg-blue-50/80 backdrop-blur-sm rounded-lg border border-blue-100/50">
                   <div className="flex items-center space-x-2 mb-2">
                     <Shield className="w-4 h-4 text-blue-600" />
@@ -212,7 +233,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     {mockMarketData.nftProperties} NFT properties available
                   </p>
                 </div>
-                
+
                 <div className="p-4 bg-purple-50/80 backdrop-blur-sm rounded-lg border border-purple-100/50">
                   <div className="flex items-center space-x-2 mb-2">
                     <TrendingUp className="w-4 h-4 text-purple-600" />

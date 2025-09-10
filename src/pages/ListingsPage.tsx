@@ -3,13 +3,16 @@ import { PropertyCard } from '../components/PropertyCard/PropertyCard';
 import { SearchFilters } from '../components/SearchFilters/SearchFilters';
 import { mockProperties } from '../data/mockData';
 import { PropertyFilters } from '../types';
+import { Search } from 'lucide-react';
 
 interface ListingsPageProps {
+  favorites: string[];
   onToggleFavorite: (id: string) => void;
   onPropertyClick: (id: string) => void;
 }
 
 export const ListingsPage: React.FC<ListingsPageProps> = ({ 
+  favorites,
   onToggleFavorite, 
   onPropertyClick 
 }) => {
@@ -55,7 +58,7 @@ export const ListingsPage: React.FC<ListingsPageProps> = ({
         filtered.sort((a, b) => b.price - a.price);
         break;
       case 'sqft-desc':
-        filtered.sort((a, b) => b.sqft - a.sqft);
+        filtered.sort((a, b) => b.squareFeet - a.squareFeet);
         break;
       case 'year-desc':
         filtered.sort((a, b) => b.yearBuilt - a.yearBuilt);
@@ -125,6 +128,7 @@ export const ListingsPage: React.FC<ListingsPageProps> = ({
               property={property}
               onToggleFavorite={onToggleFavorite}
               onClick={onPropertyClick}
+              isFavorite={favorites.includes(property.id)}
             />
           ))}
         </div>

@@ -6,12 +6,14 @@ interface PropertyCardProps {
   property: Property;
   onToggleFavorite: (id: string) => void;
   onClick: (id: string) => void;
+  isFavorite: boolean;
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({ 
   property, 
   onToggleFavorite, 
-  onClick 
+  onClick,
+  isFavorite 
 }) => {
   const formatPrice = (price: number) => {
     if (property.status === 'for-rent' || property.status === 'rented') {
@@ -20,10 +22,19 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     return `$${price.toLocaleString()}`;
   };
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite(property.id);
+  };
+
+  const handleCardClick = () => {
+    onClick(property.id);
+  };
+
   return (
     <div 
       className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:scale-[1.02] border border-white/20"
-      onClick={() => onClick(property.id)}
+      onClick={handleCardClick}
     >
       <div className="relative">
         <img 
@@ -53,17 +64,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             </span>
           )}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(property.id);
-            }}
+            onClick={handleFavoriteClick}
             className={`p-2 rounded-full transition-all duration-200 ${
-              property.favorited 
+              isFavorite 
                 ? 'bg-red-500 text-white hover:bg-red-600' 
                 : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500'
             }`}
           >
-            <Heart className={`w-4 h-4 ${property.favorited ? 'fill-current' : ''}`} />
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
         </div>
       </div>

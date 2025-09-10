@@ -16,6 +16,7 @@ export interface Property {
   isNFT?: boolean;
   walletAddress?: string;
   favorited?: boolean;
+  isFavorite?: boolean;
 }
 
 export interface User {

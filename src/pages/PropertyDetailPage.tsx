@@ -18,10 +18,14 @@ import {
 import { mockProperties } from '../data/mockData';
 
 interface PropertyDetailPageProps {
+  favorites: string[];
   onToggleFavorite: (id: string) => void;
 }
 
-export const PropertyDetailPage: React.FC<PropertyDetailPageProps> = ({ onToggleFavorite }) => {
+export const PropertyDetailPage: React.FC<PropertyDetailPageProps> = ({ 
+  favorites, 
+  onToggleFavorite 
+}) => {
   const { id } = useParams<{ id: string }>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -41,6 +45,7 @@ export const PropertyDetailPage: React.FC<PropertyDetailPageProps> = ({ onToggle
     );
   }
 
+  const isFavorite = favorites.includes(property.id);
   const formatPrice = (price: number) => {
     if (property.status === 'for-rent' || property.status === 'rented') {
       return `$${price.toLocaleString()}/mo`;
@@ -104,12 +109,12 @@ export const PropertyDetailPage: React.FC<PropertyDetailPageProps> = ({ onToggle
                   <button
                     onClick={() => onToggleFavorite(property.id)}
                     className={`p-2 rounded-full transition-all duration-200 ${
-                      property.favorited 
+                      isFavorite 
                         ? 'bg-red-500 text-white hover:bg-red-600' 
                         : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500'
                     }`}
                   >
-                    <Heart className={`w-5 h-5 ${property.favorited ? 'fill-current' : ''}`} />
+                    <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
                   <button className="p-2 rounded-full bg-white/80 text-gray-600 hover:bg-white hover:text-blue-500 transition-all duration-200">
                     <Share2 className="w-5 h-5" />

@@ -1,84 +1,128 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { Navbar } from './components/Layout/Navbar';
-import { HomePage } from './pages/HomePage';
-import { ListingsPage } from './pages/ListingsPage';
-import { PropertyDetailPage } from './pages/PropertyDetailPage';
-import { FavoritesPage } from './pages/FavoritesPage';
-import { DashboardPage } from './pages/DashboardPage';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+
+import { Navbar } from "./components/Layout/Navbar";
+import { HomePage } from "./pages/HomePage";
+import { ListingsPage } from "./pages/ListingsPage";
+import { PropertyDetailPage } from "./pages/PropertyDetailPage";
+import { FavoritesPage } from "./pages/FavoritesPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import WalletModal from "./components/Modals/WalletModal";
+
+// import your wallet hook
+import { useWallet } from "./types/wallet";
 
 const AppContent: React.FC = () => {
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [favorites, setFavorites] = useState(['1', '4']);
+  const {
+    walletAddress,
+    walletConnected,
+    isMetaMaskInstalled,
+    connectWallet,
+    disconnectWallet,
+  } = useWallet();
+
+  const [favorites, setFavorites] = useState(["1", "4"]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleConnectWallet = () => {
-    // Mock wallet connection with animation
-    setTimeout(() => {
-      setWalletConnected(!walletConnected);
-    }, 1000);
-  };
-
+  // Favorites handler
   const handleToggleFavorite = (propertyId: string) => {
-    setFavorites(prev => 
+    setFavorites((prev) =>
       prev.includes(propertyId)
-        ? prev.filter(id => id !== propertyId)
+        ? prev.filter((id) => id !== propertyId)
         : [...prev, propertyId]
     );
   };
 
+  // Navigate to property details
   const handlePropertyClick = (propertyId: string) => {
     navigate(`/property/${propertyId}`);
   };
 
   return (
     <>
-      <Navbar 
-        onConnectWallet={handleConnectWallet}
+      {/* Navbar */}
+      <Navbar
+        onConnectWallet={() => setIsModalOpen(true)}
+        onDisconnectWallet={disconnectWallet}
         walletConnected={walletConnected}
+        walletAddress={walletAddress}
       />
-      
+
+      {/* Show MetaMask warning if not installed */}
+      {!isMetaMaskInstalled && (
+        <div className="bg-red-100 text-red-700 text-center py-2">
+          MetaMask is not installed.{" "}
+          <a
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Install here
+          </a>
+        </div>
+      )}
+
+      {/* Wallet Modal */}
+      <WalletModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConnect={connectWallet}
+        walletAddress={walletAddress}
+        onDisconnect={disconnectWallet}
+      />
+
+      {/* Routes */}
       <Routes>
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            <HomePage 
+            <HomePage
               onToggleFavorite={handleToggleFavorite}
               onPropertyClick={handlePropertyClick}
             />
-          } 
+          }
         />
-        <Route 
-          path="/listings" 
+        <Route
+          path="/listings"
           element={
-            <ListingsPage 
+            <ListingsPage
               onToggleFavorite={handleToggleFavorite}
               onPropertyClick={handlePropertyClick}
             />
-          } 
+          }
         />
-        <Route 
-          path="/property/:id" 
-          element={<PropertyDetailPage onToggleFavorite={handleToggleFavorite} />} 
-        />
-        <Route 
-          path="/favorites" 
+        <Route
+          path="/property/:id"
           element={
-            <FavoritesPage 
+            <PropertyDetailPage onToggleFavorite={handleToggleFavorite} />
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <FavoritesPage
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
               onPropertyClick={handlePropertyClick}
             />
-          } 
+          }
         />
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
-            <DashboardPage 
+            <DashboardPage
               walletConnected={walletConnected}
-              onConnectWallet={handleConnectWallet}
+              onConnectWallet={() => setIsModalOpen(true)}
+              walletAddress={walletAddress}
             />
-          } 
+          }
         />
       </Routes>
     </>

@@ -5,11 +5,17 @@ import { PropertyCard } from '../components/PropertyCard/PropertyCard';
 import { mockProperties, mockMarketData } from '../data/mockData';
 
 interface HomePageProps {
+  favorites: string[];
   onToggleFavorite: (id: string) => void;
   onPropertyClick: (id: string) => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onToggleFavorite, onPropertyClick }) => {
+
+export const HomePage: React.FC<HomePageProps> = ({ 
+  favorites=[], 
+  onToggleFavorite, 
+  onPropertyClick 
+}) => {
   const featuredProperties = mockProperties.slice(0, 3);
 
   return (
@@ -164,6 +170,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onToggleFavorite, onProperty
                 property={property}
                 onToggleFavorite={onToggleFavorite}
                 onClick={onPropertyClick}
+                isFavorite={favorites.includes(property.id)}
               />
             ))}
           </div>

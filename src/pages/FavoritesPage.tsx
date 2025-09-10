@@ -47,9 +47,10 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({
               {favoriteProperties.map((property) => (
                 <PropertyCard
                   key={property.id}
-                  property={{...property, favorited: true}}
+                  property={property}
                   onToggleFavorite={onToggleFavorite}
                   onClick={onPropertyClick}
+                  isFavorite={true} // Always true since these are favorites
                 />
               ))}
             </div>
